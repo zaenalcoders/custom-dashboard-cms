@@ -1,0 +1,91 @@
+<nav [ngClass]="{'left-0': (sidenav.status | async)===false }" class="navbar flex-wrap navbar-expand-lg bg-white border-bottom fixed-top p-1">
+    <div class="container-fluid flex-nowrap">
+        <button class="btn text-primary border-0 p-0 shadow-none" ngbTooltip="Toggle Menu" (click)="sidenav.toggle()">
+            <span class="material-icons m-0">menu</span>
+            <span class="visually-hidden">
+                Toggle Menu
+            </span>
+        </button>
+        <div class="d-flex p-2 align-items-center">
+            <div [class.ms-4]="(sidenav.status | async) && sidenav.isMobile" class="border-end me-4">
+                <div ngbDropdown display="dynamic" placement="{{sidenav.isMobile?'auto':'bottom-right'}}">
+                    <button class="btn border-0 notif-dropdown position-relative pe-1" ngbDropdownToggle>
+                        <span class="material-icons fs-2">notifications_none</span>
+                    </button>
+                    <div ngbDropdownMenu class="b-dropdown" style="width: 256px;max-height:100vh;overflow-x: auto;">
+                        <ul class="notif-list">
+                            <li class="text-center py-3">
+                                <em>No notification</em>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex nav-item" ngbDropdown display="dynamic" placement="{{sidenav.isMobile?'auto':'bottom-right'}}">
+                <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center pb-2" ngbDropdownToggle>
+                    <div class="me-2">
+                        <app-avatar [height]="42" [width]="42" [name]="userData.initials"></app-avatar>
+                    </div>
+                    <div class="w-75 pe-2 d-none d-md-block">
+                        <div class="text-truncate">{{userData?.name}}</div>
+                        <div class="small text-muted fw-bold text-truncate">{{userData?.role}}</div>
+                    </div>
+                </a>
+                <ul ngbDropdownMenu class="b-dropdown" style="width: 256px;">
+                    <li>
+                        <div class="d-flex p-2 align-items-center">
+                            <div class="w-25">
+                                <app-avatar [name]="userData.initials" [height]="48" [width]="48"></app-avatar>
+                            </div>
+                            <div class="w-75">
+                                <div class="fw-bold text-nowrap text-truncate">{{userData?.name}}</div>
+                                <div class="text-nowrap text-truncate small">{{userData?.role}}</div>
+                                <div class="text-nowrap text-truncate small">{{userData?.email}}</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="/account">
+                            <span class="material-icons">account_circle</span>
+                            Account
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item btn-link" (click)="logout()">
+                            <span class="material-icons">logout</span>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <app-breadcrumb class="w-100"></app-breadcrumb>
+</nav>
+<ng-template #logoutModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Logout</h5>
+    </div>
+    <div class="modal-body">
+        Are you sure want to logout?
+    </div>
+    <div class="modal-footer d-flex justify-content-between">
+        <div>
+            <div class="spinner-border text-primary" role="status" *ngIf="loading">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-primary" (click)="modal.close()" [attr.disabled]="loading ? 'disabled' : null">Cancel</button>
+            &nbsp;
+            <button type="button" class="btn btn-secondary" (click)="goLogout()" [attr.disabled]="loading ? 'disabled' : null">Logout</button>
+        </div>
+    </div>
+</ng-template>

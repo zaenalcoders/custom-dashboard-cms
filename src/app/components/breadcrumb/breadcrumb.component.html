@@ -1,0 +1,16 @@
+<div class="container-fluid border-top" [class.d-none]="!countList">
+    <div class="d-inline-block pt-1 pb-1">
+        <nav class="nav-breadcrumb" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item fw-bold" [class.active]="i===countList-1" *ngFor="let nav of linkList | async;let i=index;">
+                    <a routerLink="{{nav?.path}}" class="btn-link" *ngIf="i!==countList-1">
+                        {{nav?.data?.title}}
+                    </a>
+                    <span *ngIf="i===countList-1">
+                        {{nav?.data?.title}}
+                    </span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>

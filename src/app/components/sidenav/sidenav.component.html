@@ -1,0 +1,25 @@
+<div [ngClass]="{'left-99': (sidenav.status | async)===false }" class="nav-container position-fixed h-100 mh-100 sidenav d-flex flex-column flex-shrink-0 z-1">
+    <div class="sidebar-heading py-2 px-0 text-center fw-bold fs-5">
+        <img src="/assets/logo.png" [width]="50">
+    </div>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a routerLink="/dashboard" [class.active]="isActive('dashboard')" class="nav-link px-3" aria-current="page">
+                <i class="material-icons">dashboard</i>
+                Dashboard
+            </a>
+        </li>
+        <ng-template ngFor let-nav let-i="index" [ngForOf]="navData | async">
+            <li class="nav-item">
+                <a *ngIf="nav.link" routerLink="/{{nav.link}}" [class.active]="isActive(nav.link)" class="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
+                    <i class="material-icons">{{nav.icon}}</i>
+                    {{nav.name}}
+                </a>
+                <a *ngIf="!nav.link" (click)="toggleNav(i)" [class.a-expanded]="isCollapsed[i]" class="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center cursor-pointer child-link">
+                    <i class="material-icons">{{nav.icon}}</i>
+                    {{nav.name}}
+                </a>
+            </li>
+        </ng-template>
+    </ul>
+</div>

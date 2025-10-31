@@ -1,0 +1,6 @@
+<div *ngIf="!imageURL" class="avatar rounded-circle d-flex justify-content-center align-items-center fw-bold shadow-sm" [ngStyle]="genStyle()">
+    {{name}}
+</div>
+<div *ngIf="imageURL" class="avatar rounded-circle d-flex justify-content-center align-items-center shadow-sm" [ngStyle]="genStyle()">
+    <img [src]="imageURL" class="img-fluid h-100 w-100 rounded-circle">
+</div>

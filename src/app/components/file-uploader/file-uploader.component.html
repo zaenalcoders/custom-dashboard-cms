@@ -1,0 +1,50 @@
+<div *ngIf="elementType=='div'" class="zx-file-uploader" [style.height]="elementHeight" [style.width]="elementWidth" [style.background-size]="'cover'" [ngClass]="{'bg-secondary bg-opacity-10': !fileName}" [style.background]="(isImage && fileName) ? 'url(' + assetUrl+fileName + ') no-repeat center center / cover':''" class="border rounded position-relative">
+    <div *ngIf="fileName && !isLoading && !isViewOnly" class="delete-file delete-file position-absolute end-0">
+        <button class="btn btn-danger p-0" (click)="deleteFile()">
+            <i class="material-icons">close</i>
+        </button>
+    </div>
+    <div class="d-flex justify-content-center align-items-center flex-wrap h-100" [class.pointer]="!(response | async)?.isLoading && !isViewOnly" (click)="browseFile()">
+        <div *ngIf="!fileName && !isLoading" class="w-100 text-center">
+            {{isViewOnly?'No file uploaded':'Upload File Here'}}
+        </div>
+        <div class="spinner-border text-primary" role="status" *ngIf="isLoading">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div *ngIf="errorMessage" class="text-danger small position-absolute text-center w-100 error-msg px-2">{{errorMessage}}</div>
+    <div *ngIf="!isViewOnly" class="text-center w-100 position-absolute bottom-0 btn-upload p-1">
+        <button type="button" [attr.disabled]="isLoading ? 'disabled' : null" class="btn btn-secondary btn-sm" (click)="browseFile()"><i class="material-icons">find_in_page</i>&nbsp; {{fileName?'Change':'Browse'}} file</button>
+    </div>
+</div>
+<div *ngIf="elementType=='input'" class="position-relative">
+    <div class="loading position-absolute z-1 w-100 h-100 text-center" *ngIf="isLoading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <input type="text" [attr.disabled]="isDisabled || isLoading ? 'disabled' : null" [value]="fileName || ''" (click)="browseFile();" class="form-control" [class.is-invalid]="isInvalid" readonly placeholder="{{isViewOnly?fileName||'No file uploaded':'Upload file here'}}">
+        <button *ngIf="fileName" ngbTooltip="View File" [attr.disabled]="isDisabled || isLoading ? 'disabled' : null" class="btn btn-outline-primary" type="button" (click)="viewFile();">
+            <i class="material-icons">preview</i>
+        </button>
+        <button *ngIf="!isViewOnly" [attr.disabled]="isDisabled || isLoading ? 'disabled' : null" class="btn btn-outline-secondary" ngbTooltip="Upload File" type="button" (click)="browseFile();">
+            <i class="material-icons">file_upload</i>
+        </button>
+    </div>
+    <div *ngIf="errorMessage" class="text-danger small position-absolute w-100 error-msg" style="top:unset !important;">{{errorMessage}}</div>
+</div>
+<ng-container *ngIf="elementType=='button'">
+    <button *ngIf="fileName" ngbTooltip="View File" [attr.disabled]="isDisabled || isLoading ? 'disabled' : null" class="{{elementClass || 'btn btn-outline-primary'}} ms-1" type="button" (click)="viewFile();">
+        <i class="material-icons">preview</i>
+    </button>
+    <button *ngIf="!isViewOnly" [attr.disabled]="isDisabled || isLoading ? 'disabled' : null" class="{{elementClass || 'btn btn-outline-secondary btn-sm'}}" ngbTooltip="Upload File" type="button" (click)="browseFile();">
+        <div *ngIf="isLoading" class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <span *ngIf="!isLoading">
+            {{buttonName}}<i class="material-icons">file_upload</i>
+        </span>
+    </button>
+</ng-container>
+<input type="file" class="d-none" #inputFile accept="{{fileType}}" (change)="handle($event)" />

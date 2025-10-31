@@ -1,0 +1,53 @@
+<div class="row mb-4">
+    <div class="col-sm-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="d-flex flex-nowrap align-items-center justify-content-between col-12 mb-4">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-secondary btn-sm me-3" (click)="back()" ngbTooltip="Back">
+                                <i class="material-icons">arrow_back</i>
+                            </button>
+                            <h4 class="card-title col-12 lh-0 m-0">Create data source</h4>
+                        </div>
+                    </div>
+                    <form #theForm="ngForm" (ngSubmit)="submitForm(formGroup)" novalidate class="col-md-8">
+                        <div [formGroup]="formGroup" class="row">
+                            <div class="col-12">
+                                <div class="form-floating mb-4">
+                                    <input type="text" formControlName="name" [class.is-invalid]="formGroup.get('name')?.invalid && (theForm.submitted || formGroup.get('name')?.touched)" placeholder="..." class="form-control" required>
+                                    <label>Data Name</label>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('name')?.invalid && (theForm.submitted || formGroup.get('name')?.touched)">
+                                        <small *ngIf="formGroup.get('name')?.errors?.required">Please type data name</small>
+                                        <small *ngIf="formGroup.get('name')?.errors?.serverError">{{ formGroup.get('name')?.errors?.serverError }}</small>
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-4">
+                                    <div class="input-group">
+                                        <div class="form-floating form-floating-group flex-grow-1">
+                                            <input type="text" (click)="fileUploader.browseFile()" readonly placeholder="..." formControlName="file" [class.is-invalid]="formGroup.get('file')?.invalid && (theForm.submitted || formGroup.get('file')?.touched)" class="form-control" required>
+                                            <label>Data File</label>
+                                        </div>
+                                        <div class="d-flex align-items-center rounded-end">
+                                            <app-file-uploader #fileUploader [isDisabled]="loading.status | async" [elementType]="'button'" [initialFileName]="formGroup.get('file')?.value" [buttonName]="''" [elementClass]="'btn text-muted border-0'" [fileType]="'text/csv,application/csv,application/x-csv,text/comma-separated-values,text/x-comma-separated-values,text/plain'" [isInvalid]="formGroup.get('file')?.invalid && (theForm.submitted || formGroup.get('file')?.touched)" (response)="formGroup.get('file')?.setValue($event)" />
+                                        </div>
+                                    </div>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('file')?.invalid && (theForm.submitted || formGroup.get('file')?.touched)">
+                                        <small *ngIf="formGroup.get('file')?.errors?.required">Please upload file</small>
+                                        <small *ngIf="formGroup.get('file')?.errors?.serverError">{{ formGroup.get('file')?.errors?.serverError }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center border-top pt-1">
+                            <button type="button" class="btn btn-secondary" (click)="back()" [attr.disabled]="(loading.status | async) ? 'disabled' : null"><i class="material-icons">close</i> &nbsp; Cancel</button>
+                            &nbsp;
+                            <button type="submit" class="btn btn-primary" [attr.disabled]="(loading.status | async) ? 'disabled' : null"><i class="material-icons">save</i> &nbsp; Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+@import "../../../styles.var.scss";
+.navbar {
+    transition: $transition-base;
+    left: 260px;
+}
+
+a {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    cursor: pointer;
+}
+.material-icons {
+    margin-right: 12px;
+}
+
+.notif-dropdown:after {
+    display: none !important;
+}
+
+.notif-count {
+    height: 20px;
+    width: 20px;
+    font-size: 10px;
+}
+
+.notif-list {
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    a:active {
+        background: unset;
+        color: unset;
+    }
+    .time {
+        font-size: 10px;
+    }
+}

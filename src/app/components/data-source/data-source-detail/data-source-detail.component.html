@@ -1,0 +1,137 @@
+<div class="row mb-4">
+    <div class="col-sm-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="d-flex flex-nowrap align-items-center justify-content-between col-12">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-secondary btn-sm me-3" (click)="back()" ngbTooltip="Back">
+                                <i class="material-icons">arrow_back</i>
+                            </button>
+                            <h4 class="card-title col-12 lh-0 m-0">Data source detail</h4>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-primary me-2" [class.disabled]="loading.status | async" ngbTooltip="Edit" routerLink="edit">
+                                <i class="material-icons">edit</i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" ngbTooltip="Delete" [class.disabled]="loading.status | async" (click)="deleteDialog.show([data.id])">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-center col-12" *ngIf="!data.id">
+                        <div class="spinner-grow" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="data.id" class="col-md-12">
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="border rounded p-3">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="form-floating mb-4">
+                                                <input type="text" [value]="data.name" placeholder="..." class="form-control" readonly>
+                                                <label>Data name</label>
+                                            </div>
+                                            <div class="form-floating mb-4">
+                                                <div class="input-group">
+                                                    <div class="form-floating form-floating-group flex-grow-1">
+                                                        <input type="text" readonly placeholder="..." [value]="data.file" class="form-control">
+                                                        <label>Data file</label>
+                                                    </div>
+                                                    <div class="d-flex align-items-center rounded-end">
+                                                        <app-file-uploader [isViewOnly]="true" [elementType]="'button'" [initialFileName]="data.file" [buttonName]="''" [elementClass]="'btn text-muted border-0'" [fileType]="'text/csv,application/csv,application/x-csv,text/comma-separated-values,text/x-comma-separated-values,text/plain'" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-floating mb-4">
+                                                <input type="text" [value]="data.total_rows" placeholder="..." class="form-control" readonly>
+                                                <label>Total rows</label>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-4">
+                                                        <input type="text" [value]="data.created_at | date:'EEEE, dd MMMM YYYY, HH:mm:ss z'" placeholder="..." class="form-control" readonly>
+                                                        <label>Created at</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-4">
+                                                        <input type="text" [value]="data.updated_at | date:'EEEE, dd MMMM YYYY, HH:mm:ss z'" placeholder="..." class="form-control" readonly>
+                                                        <label>Updated at</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-4">
+                                                        <input type="text" [value]="data.creator?.name || '-'" placeholder="..." class="form-control" readonly>
+                                                        <label>Created by</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-4">
+                                                        <input type="text" [value]="data.updater?.name || '-'" placeholder="..." class="form-control" readonly>
+                                                        <label>Updated by</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="pt-4 border-top">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Column</th>
+                                                            <th>Data type</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let detail of data.columns;index as i;">
+                                                            <td>{{i+1}}</td>
+                                                            <td>
+                                                                {{detail.name}}
+                                                            </td>
+                                                            <td>
+                                                                {{detail.type}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #deleteModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Delete</h5>
+    </div>
+    <div class="modal-body">Are you sure want to delete this data?</div>
+    <div class="modal-footer d-flex justify-content-between">
+        <div>
+            <div class="spinner-border text-primary" role="status" *ngIf="deleteDialog.isDeleting && (loading.status|async)">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-primary" (click)="modal.close()" [attr.disabled]="(loading.status|async) ? 'disabled' : null">Cancel</button>
+            &nbsp;
+            <button type="button" class="btn btn-danger" (click)="deleteDialog.submit()" [attr.disabled]="(loading.status|async) ? 'disabled' : null">Delete</button>
+        </div>
+    </div>
+</ng-template>

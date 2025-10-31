@@ -1,0 +1,49 @@
+<div class="row">
+    <div class="col-12 col-md-4 mx-auto pt-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-center">
+                    <div>
+                        <h4 class="fw-bold pt-3">Custom Dashboard</h4>
+                        <p class="text-muted fw-bold">
+                            Enter your credentials to continue.
+                        </p>
+                    </div>
+                </div>
+                <form class="p-md-3 col-12" [formGroup]="loginForm" #thisForm="ngForm" (ngSubmit)="submitForm(loginForm)" novalidate>
+                    <div class="form-floating mb-4">
+                        <input type="email" formControlName="email" [class.is-invalid]="loginForm.get('email')?.invalid && (thisForm.submitted || loginForm.get('email')?.touched)" placeholder="name@example.com" class="form-control">
+                        <label class="d-flex align-items-center"><i class="material-icons fs-5">email</i>&nbsp;Email</label>
+                        <div class="text-danger position-absolute w-100" *ngIf="loginForm.get('email')?.invalid && (thisForm.submitted || loginForm.get('email')?.touched)">
+                            <small class="small" *ngIf="loginForm.get('email')?.errors?.required">Type your email address</small>
+                            <small *ngIf="loginForm.get('email')?.errors?.email">Email isn't valid</small>
+                            <small *ngIf="loginForm.get('email')?.errors?.serverError">{{loginForm.get('email')?.errors?.serverError}}</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-4">
+                        <div class="form-floating">
+                            <input type="{{showPassword?'text':'password'}}" #passwordInput formControlName="password" [class.is-invalid]="loginForm.get('password')?.invalid && (thisForm.submitted || loginForm.get('password')?.touched)" placeholder="Password" class="form-control border-end-0">
+                            <label class="d-flex align-items-center"><i class="material-icons fs-5">lock</i>&nbsp;Password</label>
+                            <div class="text-danger position-absolute" *ngIf="loginForm.get('password')?.invalid && (thisForm.submitted || loginForm.get('password')?.touched)">
+                                <small *ngIf="loginForm.get('password')?.errors?.required">Type your password</small>
+                                <small *ngIf="loginForm.get('password')?.errors?.serverError">{{loginForm.get('password')?.errors?.serverError}}</small>
+                            </div>
+                        </div>
+                        <span class="input-group-text border-start-0" [class.disabled]="loading.status" [class.border-danger]="loginForm.get('password')?.invalid && (thisForm.submitted || loginForm.get('password')?.touched)">
+                            <button class="btn m-0 outline-0 border-0 shadow-none p-0" type="button" (click)="showPassword = !showPassword;passwordInput.focus();" [attr.disabled]="loading.status?'disabled':null">
+                                <i class="material-icons">{{showPassword?'visibility_off':'visibility'}}</i>
+                            </button>
+                        </span>
+                    </div>
+                    <div class="row d-flex justify-content-between pt-2">
+                        <div class="col-md-6 col-12">
+                            <button type="submit" [attr.disabled]="loading.status?'disabled':null" class="btn btn-primary py-2 px-4 w-100">
+                                Login
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

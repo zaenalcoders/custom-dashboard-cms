@@ -1,0 +1,47 @@
+@import "../styles.var.scss";
+.content-main {
+    transition: $transition-base;
+}
+.loading {
+    height: 6px;
+    background-color: $primary;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 99999;
+    opacity: 1;
+    -webkit-animation: fadeinout 1s linear infinite;
+    animation: fadeinout 1s linear infinite;
+}
+
+@-webkit-keyframes fadeinout {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeinout {
+    0%,
+    100% {
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.sidenav-opened {
+    padding-left: 273px;
+}
+
+.navbar-opened {
+    padding-top: 117px;
+}
+.auth-timeout {
+    z-index: 1059;
+    backdrop-filter: blur(15px);
+}

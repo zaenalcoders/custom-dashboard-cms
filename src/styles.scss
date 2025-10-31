@@ -1,1 +1,369 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import "./styles.var.scss";
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "../node_modules/ngx-toastr/toastr.css";
+
+html {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.btnImage {
+    border-radius: 12px;
+    background-color: white;
+    border: 1px solid white;
+    transition: background-color 0.5s ease;
+}
+.btnImage:hover {
+    background-color: gainsboro;
+    cursor: pointer;
+}
+
+.toast-container {
+    position: fixed !important;
+}
+
+.btn-link {
+    text-decoration: none !important;
+}
+
+.progressBar {
+    height: 0.25rem;
+    width: 100%;
+    background: linear-gradient($primary 0 0), linear-gradient($secondary 0 0), rgba(255, 255, 255, 0.2);
+    background-size: 60% 100%;
+    background-repeat: no-repeat;
+    animation: progressBar 3s infinite;
+}
+
+@keyframes progressBar {
+    0% {
+        background-position:
+            -150% 0,
+            -150% 0;
+    }
+
+    66% {
+        background-position:
+            250% 0,
+            -150% 0;
+    }
+
+    100% {
+        background-position:
+            250% 0,
+            250% 0;
+    }
+}
+
+a {
+    text-decoration: none;
+    &.disabled {
+        opacity: $btn-disabled-opacity;
+        pointer-events: none;
+    }
+}
+.btn {
+    .material-icons {
+        font-size: 1.35rem;
+        @at-root {
+            .btn {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+}
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    appearance: none;
+    display: none;
+}
+.btn-close-search {
+    background-color: $input-bg !important;
+    margin-top: 2px;
+    margin-right: 2px;
+}
+input[required]:not([type="radio"]),
+ng-select[required],
+select[required],
+textarea[required] {
+    + label:after {
+        content: " *" !important;
+        color: red;
+        vertical-align: top;
+        position: relative !important;
+        inset: unset !important;
+        background: transparent !important;
+    }
+}
+label {
+    &.required:after {
+        content: " *" !important;
+        color: red;
+        vertical-align: top;
+        position: relative !important;
+        inset: unset !important;
+        background: transparent !important;
+    }
+    &.floating {
+        height: 1.5em;
+        opacity: 0.65;
+        transform: scale(0.85) translateY(-0.1rem) translateX(-0.5rem);
+    }
+}
+
+.ng-select {
+    height: auto !important;
+    .ng-select-container {
+        background: none !important;
+        color: unset !important;
+        border-radius: unset !important;
+        border: none !important;
+        min-height: 22px !important;
+        height: auto !important;
+        border-color: unset !important;
+        box-shadow: none !important;
+        .ng-value-container .ng-input {
+            top: unset !important;
+            padding-left: 0px !important;
+        }
+    }
+    .ng-select-container .ng-value-container {
+        padding-left: 0px !important;
+        flex-wrap: wrap !important;
+    }
+    .ng-dropdown-panel {
+        z-index: 1020 !important;
+    }
+    &.ng-select-disabled,
+    &.ng-select-readonly {
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
+    }
+    &.ng-select-focused {
+        box-shadow: $form-select-focus-box-shadow;
+        &.is-invalid {
+            box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($danger, $input-btn-focus-color-opacity);
+        }
+    }
+}
+.btn-group-toggle {
+    [type="radio"],
+    [type="checkbox"] {
+        display: none;
+    }
+}
+.left-99 {
+    left: -399px !important;
+}
+
+.left-0 {
+    left: 0 !important;
+}
+.table {
+    tr,
+    td,
+    th {
+        vertical-align: middle;
+    }
+}
+th[sortable] {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+th[sortable].asc:after,
+th[sortable].desc:after {
+    content: "";
+    display: inline-block;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAYCAYAAAD6S912AAABAklEQVQ4je2VP4oCMRSHP0fB0j+N9usBtBc9gB5CZDtvIFvYWdppoSJY2AseQbBTjyBab7HNigoqgZclDJlxZrYS5gc/CO+9fAkvISGAOsAF+AU+g0zwUx94uNyLChtaYNqDsLCpD0x7FBS2CADTnvuBHGAVAqa9BBJuWA7YRIBpr4GMhuWBvaXoBIyBmxFT44nk3PVbIKuAXx6rloGSJf4BVDzmdB25tKbuQEN2XbD0ugjsgKZATJ3VOCWnpZIHoGYUVC27qBr5OnCU+AxImnTV1LRrxVdAZM7fgaSMxI/HdXqli9k2JyLEUzEwBr4D8FueLK2rxP6ltrwi6htt+ZKAJ40gfuMAQqTfAAAAAElFTkSuQmCC)
+        top center no-repeat;
+    background-size: 12px;
+    width: 12px;
+    height: 12px;
+    transition: $transition-base;
+}
+th[sortable].desc:after {
+    transform: rotate(180deg);
+}
+.table {
+    th {
+        border-bottom: none !important;
+        background-color: tint-color($black, 97%);
+    }
+    tbody {
+        border-top: none !important;
+    }
+}
+.modal-transparent {
+    .modal-content {
+        background: transparent !important;
+        border: 0 !important;
+    }
+}
+
+.ng-select {
+    .ng-select-container {
+        position: relative;
+        .ng-clear-wrapper {
+            margin-right: 15px;
+        }
+        .ng-arrow-wrapper {
+            position: absolute;
+            z-index: 111;
+            background-color: $input-bg;
+            right: -10px;
+        }
+    }
+}
+.ng-select.ng-select-disabled {
+    .ng-arrow-wrapper,
+    .ng-clear-wrapper {
+        display: none;
+    }
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.qr {
+    width: 100%;
+}
+
+.scan {
+    font-size: 60px;
+}
+.form-floating {
+    .textareabox {
+        height: 100px;
+    }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    appearance: textfield;
+}
+.ngb-dp-today {
+    .btn-light {
+        background-color: tint-color($primary, 70%);
+    }
+}
+.ngb-dp-arrow-btn {
+    padding: 0 7px !important;
+    box-shadow: none !important;
+}
+.bg-gray {
+    background-color: $gray-600;
+}
+.input-group {
+    .form-floating + div {
+        background: $input-bg;
+    }
+}
+
+.material-icons {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+    visibility: hidden;
+}
+
+.fonts-loaded .material-icons {
+    visibility: visible;
+}
+
+.step-container {
+    flex-grow: 1;
+    position: relative;
+    opacity: 0.7;
+    .icon-step {
+        background-color: var(--bs-gray) !important;
+    }
+    &:before {
+        background-color: var(--bs-gray) !important;
+        width: 100%;
+        height: 2px;
+        position: absolute;
+        top: 22.5%;
+        content: "";
+        z-index: 0;
+        transform: translateY(-30%);
+        display: flex;
+        flex-grow: 1;
+    }
+    &.active {
+        opacity: 1;
+        .icon-step {
+            background: rgb(var(--bs-success-rgb)) !important;
+        }
+        &:before {
+            background-color: rgb(var(--bs-success-rgb)) !important;
+        }
+    }
+    &.reject {
+        opacity: 1;
+        .icon-step {
+            background: rgb(var(--bs-danger-rgb)) !important;
+        }
+        &:before {
+            background-color: rgb(var(--bs-danger-rgb)) !important;
+        }
+    }
+}
+.icon-step {
+    margin-bottom: 0.3rem;
+    .material-icons {
+        position: absolute;
+        z-index: 1;
+    }
+}
+
+.badge {
+    font-weight: 400;
+}
+
+.text-area {
+    min-height: 100px !important;
+}
+
+.filter-badge {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: -5px;
+    margin-right: -5px;
+}
+.form-control {
+    .form-check {
+        input[type="radio"]:not(:checked) {
+            background-color: $light;
+        }
+    }
+}
+.fw-bold {
+    button {
+        font-weight: bold;
+    }
+}

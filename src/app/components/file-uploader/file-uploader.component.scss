@@ -1,0 +1,22 @@
+.btn-upload {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.zx-file-uploader {
+    background-size: cover !important;
+}
+
+.error-msg {
+    top: 10px;
+    &:empty {
+        display: none;
+    }
+}
+
+.loading {
+    background: rgba(255, 255, 255, 0.5);
+}
