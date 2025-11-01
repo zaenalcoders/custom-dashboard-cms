@@ -29,7 +29,7 @@
                                 <small *ngIf="loginForm.get('password')?.errors?.serverError">{{loginForm.get('password')?.errors?.serverError}}</small>
                             </div>
                         </div>
-                        <span class="input-group-text border-start-0" [class.disabled]="loading.status" [class.border-danger]="loginForm.get('password')?.invalid && (thisForm.submitted || loginForm.get('password')?.touched)">
+                        <span class="input-group-text border-start-0" [class.disabled]="(loading.status|async)" [class.border-danger]="loginForm.get('password')?.invalid && (thisForm.submitted || loginForm.get('password')?.touched)">
                             <button class="btn m-0 outline-0 border-0 shadow-none p-0" type="button" (click)="showPassword = !showPassword;passwordInput.focus();" [attr.disabled]="loading.status?'disabled':null">
                                 <i class="material-icons">{{showPassword?'visibility_off':'visibility'}}</i>
                             </button>
@@ -37,7 +37,7 @@
                     </div>
                     <div class="row d-flex justify-content-between pt-2">
                         <div class="col-md-6 col-12">
-                            <button type="submit" [attr.disabled]="loading.status?'disabled':null" class="btn btn-primary py-2 px-4 w-100">
+                            <button type="submit" [attr.disabled]="(loading.status|async)?'disabled':null" class="btn btn-primary py-2 px-4 w-100">
                                 Login
                             </button>
                         </div>
