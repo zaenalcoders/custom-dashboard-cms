@@ -4,6 +4,7 @@
 @import "./styles.var.scss";
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 @import "../node_modules/ngx-toastr/toastr.css";
+@import "../node_modules/@ng-select/ng-select/scss/default.theme.scss";
 
 html {
     overflow-y: auto !important;
@@ -365,5 +366,41 @@ input[type="number"] {
 .fw-bold {
     button {
         font-weight: bold;
+    }
+}
+
+.ng-select {
+    height: auto !important;
+    .ng-select-container {
+        background: none !important;
+        color: unset !important;
+        border-radius: unset !important;
+        border: none !important;
+        min-height: 22px !important;
+        height: auto !important;
+        border-color: unset !important;
+        box-shadow: none !important;
+        .ng-value-container .ng-input {
+            top: unset !important;
+            padding-left: 0px !important;
+        }
+    }
+    .ng-select-container .ng-value-container {
+        padding-left: 0px !important;
+        flex-wrap: wrap !important;
+    }
+    .ng-dropdown-panel {
+        z-index: 1020 !important;
+    }
+    &.ng-select-disabled,
+    &.ng-select-readonly {
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
+    }
+    &.ng-select-focused {
+        box-shadow: $form-select-focus-box-shadow;
+        &.is-invalid {
+            box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($danger, $input-btn-focus-color-opacity);
+        }
     }
 }

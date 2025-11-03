@@ -1,0 +1,8 @@
+.dropdown-toggle {
+    &::after {
+        content: unset;
+    }
+}
+.dropdown-menu {
+    --bs-dropdown-min-width: 1rem;
+}

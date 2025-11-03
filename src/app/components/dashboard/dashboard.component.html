@@ -1,159 +1,279 @@
 <div class="text-center p-5">
-    <button class="btn btn-primary" [attr.disabled]="(loading.status|async)?'disabled':null" (click)="formDialog.show()">Create Chart</button>
+    <button class="btn btn-primary" [attr.disabled]="(loading.status|async) || modalLoading?'disabled':null" (click)="formDialog.show()">
+        <span>Create Chart</span>
+    </button>
 </div>
 
 <div class="row">
-    <div *ngIf="loading.status | async" class="col-12 text-center p-5">
+    <div *ngIf="(loading.status | async) && !chartData.length" class="col-12 text-center p-5">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div *ngFor="let chart of chartData" class="{{chart.item?.config?.chart_size??'col-12'}} mb-3">
-        <div class="card">
+    <div *ngFor="let chart of chartList" class="{{chart.config?.chart_size??'col-12'}} mb-3">
+        <div class="card h-100">
             <div class="position-absolute end-0 top-0 me-1 mt-1">
-                <button class="btn btn-outline-secondary p-1" (click)="formDialog.show(chart.item)">
-                    <i class="material-icons">edit</i>
-                </button>
+                <div class="d-flex nav-item justify-content-center" ngbDropdown display="dynamic" placement="bottom-right" container="body">
+                    <button [disabled]="loading.status | async" class="btn btn-sm text-primary border-primary border-0 outline-0 dropdown-toggle" ngbDropdownToggle>
+                        <i class="material-icons">more_vert</i>
+                    </button>
+                    <ul ngbDropdownMenu>
+                        <li>
+                            <button [attr.disabled]="(loading.status | async) ? 'disabled' : null" class="dropdown-item btn-link d-flex align-items-center" (click)="formDialog.show(chart)">
+                                <i class="material-icons fs-5 me-3">edit</i> Edit
+                            </button>
+                        </li>
+                        <li>
+                            <button [attr.disabled]="(loading.status | async) ? 'disabled' : null" class="dropdown-item btn-link d-flex align-items-center" (click)="deleteDialog.show(chart?.id)">
+                                <i class="material-icons fs-5 me-3">delete</i>
+                                Delete
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="text-center">{{chart.item?.name}}</div>
-                <div *ngIf="chartLoading" class="text-center">
+            <div class="card-body h-100">
+                <div class="text-center mb-2">{{chart?.name}}</div>
+                <div *ngIf="chart?.loading" class="text-center">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-                <ng-container *ngIf="chart.chart!=undefined">
-                    <canvas id="{{chart.item?.id}}" [class.d-none]="chartLoading"></canvas>
+                <ng-container *ngIf="chart.chart_type!='table'">
+                    <canvas id="{{chart?.id}}" [class.d-none]="chart?.loading"></canvas>
                 </ng-container>
-                <ng-container *ngIf="chart.chart==undefined">
-                    <div class="table-responsive">
+                <ng-container *ngIf="chart.chart_type=='table'">
+                    <div class="table-responsive" [class.d-none]="chart?.loading">
                         <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th *ngFor="let column of chart.config?.columns" class="text-capitalize">{{column}}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="{{chart.id}}"></tbody>
                         </table>
                     </div>
                 </ng-container>
             </div>
         </div>
     </div>
+</div>
 
 
-    <ng-template #formModal let-modal>
-        <div class="modal-header">
-            <h5 class="modal-title">{{formDialog.id?'Edit':'Create'}} Chart</h5>
-        </div>
-        <div class="modal-body">
-            <div class="row">
-                <form #theForm="ngForm" (ngSubmit)="formDialog.submitForm()" novalidate class="col-12">
-                    <div [formGroup]="formGroup" class="row">
-                        <div class="col-12">
-                            <div class="form-floating mb-4">
-                                <input type="text" formControlName="name" [class.is-invalid]="formGroup.get('name')?.invalid && (theForm.submitted || formGroup.get('name')?.touched)" placeholder="..." class="form-control" required>
-                                <label>Title</label>
-                                <div class="text-danger position-absolute" *ngIf="formGroup.get('name')?.invalid && (theForm.submitted || formGroup.get('name')?.touched)">
-                                    <small *ngIf="formGroup.get('name')?.errors?.required">Please type title</small>
-                                    <small *ngIf="formGroup.get('name')?.errors?.serverError">{{ formGroup.get('name')?.errors?.serverError }}</small>
+<ng-template #formModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{formDialog.id?'Edit':'Create'}} Chart</h5>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <form #theForm="ngForm" (ngSubmit)="formDialog.submitForm()" novalidate class="col-12">
+                <div [formGroup]="formGroup" class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-floating mb-4">
+                                    <input type="text" formControlName="name" [class.is-invalid]="formGroup.get('name')?.invalid && (theForm.submitted || formGroup.get('name')?.touched)" placeholder="..." class="form-control" required>
+                                    <label>Title</label>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('name')?.invalid && (theForm.submitted || formGroup.get('name')?.touched)">
+                                        <small *ngIf="formGroup.get('name')?.errors?.required">Please type title</small>
+                                        <small *ngIf="formGroup.get('name')?.errors?.serverError">{{ formGroup.get('name')?.errors?.serverError }}</small>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-floating mb-4">
-                                <select formControlName="data_source_id" [class.is-invalid]="formGroup.get('data_source_id')?.invalid && (theForm.submitted || formGroup.get('data_source_id')?.touched)" class="form-select">
-                                    <option *ngFor="let source of dataSources" [value]="source.id">{{source.name}}</option>
-                                </select>
-                                <label>Data source</label>
-                                <div class="text-danger position-absolute" *ngIf="formGroup.get('data_source_id')?.invalid && (theForm.submitted || formGroup.get('data_source_id')?.touched)">
-                                    <small *ngIf="formGroup.get('data_source_id')?.errors?.required">Please select data source</small>
-                                    <small *ngIf="formGroup.get('data_source_id')?.errors?.serverError">{{ formGroup.get('data_source_id')?.errors?.serverError }}</small>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-4">
+                                    <ng-select formControlName="data_source_id" [clearable]="false" placeholder="-" loadingText="Loading..." [class.is-invalid]="formGroup.get('data_source_id')?.invalid && (theForm.submitted || formGroup.get('data_source_id')?.touched)" class="form-control">
+                                        <ng-option *ngFor="let source of dataSources" [value]="source.id">{{source.name}}</ng-option>
+                                    </ng-select>
+                                    <label>Data source</label>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('data_source_id')?.invalid && (theForm.submitted || formGroup.get('data_source_id')?.touched)">
+                                        <small *ngIf="formGroup.get('data_source_id')?.errors?.required">Please select data source</small>
+                                        <small *ngIf="formGroup.get('data_source_id')?.errors?.serverError">{{ formGroup.get('data_source_id')?.errors?.serverError }}</small>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-floating mb-4">
-                                <select formControlName="chart_type" [class.is-invalid]="formGroup.get('chart_type')?.invalid && (theForm.submitted || formGroup.get('chart_type')?.touched)" class="form-select">
-                                    <option value="bar">Bar</option>
-                                    <option value="line">Line</option>
-                                    <option value="pie">Pie</option>
-                                    <option value="doughnut">Doughnut</option>
-                                    <option value="table">Table</option>
-                                    <!-- <option value="scatter">Scatter</option>
-                                <option value="area">Area</option>
-                                <option value="column">Column</option>
-                                <option value="donut">Donut</option>
-                                <option value="bubble">Bubble</option> -->
-                                </select>
-                                <label>Chart type</label>
-                                <div class="text-danger position-absolute" *ngIf="formGroup.get('chart_type')?.invalid && (theForm.submitted || formGroup.get('chart_type')?.touched)">
-                                    <small *ngIf="formGroup.get('chart_type')?.errors?.required">Please select chart type</small>
-                                    <small *ngIf="formGroup.get('chart_type')?.errors?.serverError">{{ formGroup.get('chart_type')?.errors?.serverError }}</small>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-4">
+                                    <ng-select formControlName="limit" [class.is-invalid]="formGroup.get('limit')?.invalid && (theForm.submitted || formGroup.get('limit')?.touched)" class="form-control">
+                                        <ng-option [value]="5">5</ng-option>
+                                        <ng-option [value]="10">10</ng-option>
+                                        <ng-option [value]="20">20</ng-option>
+                                    </ng-select>
+                                    <label>Limit</label>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('limit')?.invalid && (theForm.submitted || formGroup.get('limit')?.touched)">
+                                        <small *ngIf="formGroup.get('limit')?.errors?.required">Please select limit</small>
+                                        <small *ngIf="formGroup.get('limit')?.errors?.serverError">{{ formGroup.get('limit')?.errors?.serverError }}</small>
+                                    </div>
                                 </div>
                             </div>
-                            <ng-container *ngIf="['bar', 'line'].includes(formGroup.get('chart_type')?.value)">
+                            <div class="col-md-6">
                                 <div class="form-floating mb-4">
-                                    <select formControlName="x" [class.is-invalid]="formGroup.get('x')?.invalid && (theForm.submitted || formGroup.get('x')?.touched)" class="form-select">
-                                        <option *ngFor="let column of columns" [value]="column.name">{{column.name}}</option>
-                                    </select>
-                                    <label>X axis column</label>
-                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('x')?.invalid && (theForm.submitted || formGroup.get('x')?.touched)">
-                                        <small *ngIf="formGroup.get('x')?.errors?.required">Please select column</small>
-                                        <small *ngIf="formGroup.get('x')?.errors?.serverError">{{ formGroup.get('x')?.errors?.serverError }}</small>
+                                    <ng-select formControlName="chart_type" [clearable]="false" placeholder="-" loadingText="Loading..." [class.is-invalid]="formGroup.get('chart_type')?.invalid && (theForm.submitted || formGroup.get('chart_type')?.touched)" class="form-control">
+                                        <ng-option value="bar">Bar</ng-option>
+                                        <ng-option value="line">Line</ng-option>
+                                        <ng-option value="pie">Pie</ng-option>
+                                        <ng-option value="doughnut">Doughnut</ng-option>
+                                        <!-- <ng-option value="column">Column</ng-option> -->
+                                        <!-- <ng-option value="scatter">Scatter</ng-option>
+                                        <ng-option value="area">Area</ng-option>
+                                        <ng-option value="column">Column</ng-option>
+                                        <ng-option value="donut">Donut</ng-option>
+                                        <ng-option value="bubble">Bubble</ng-option> -->
+                                        <ng-option value="table">Table</ng-option>
+                                    </ng-select>
+                                    <label>Chart type</label>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('chart_type')?.invalid && (theForm.submitted || formGroup.get('chart_type')?.touched)">
+                                        <small *ngIf="formGroup.get('chart_type')?.errors?.required">Please select chart type</small>
+                                        <small *ngIf="formGroup.get('chart_type')?.errors?.serverError">{{ formGroup.get('chart_type')?.errors?.serverError }}</small>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="form-floating mb-4">
-                                    <select formControlName="y" [class.is-invalid]="formGroup.get('y')?.invalid && (theForm.submitted || formGroup.get('y')?.touched)" class="form-select">
-                                        <option *ngFor="let column of columns" [value]="column.name">{{column.name}}</option>
-                                    </select>
-                                    <label>Y axis column</label>
-                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('y')?.invalid && (theForm.submitted || formGroup.get('y')?.touched)">
-                                        <small *ngIf="formGroup.get('y')?.errors?.required">Please select column</small>
-                                        <small *ngIf="formGroup.get('y')?.errors?.serverError">{{ formGroup.get('y')?.errors?.serverError }}</small>
+                                    <ng-select formControlName="chart_size" placeholder="-" loadingText="Loading..." [class.is-invalid]="formGroup.get('chart_size')?.invalid && (theForm.submitted || formGroup.get('chart_size')?.touched)" class="form-control" required>
+                                        <ng-option [value]="'col-md-12'">1/1</ng-option>
+                                        <ng-option [value]="'col-md-6'">1/2</ng-option>
+                                        <ng-option [value]="'col-md-4'">1/3</ng-option>
+                                        <ng-option [value]="'col-md-3'">1/4</ng-option>
+                                    </ng-select>
+                                    <label>Chart size</label>
+                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('chart_size')?.invalid && (theForm.submitted || formGroup.get('chart_size')?.touched)">
+                                        <small *ngIf="formGroup.get('chart_size')?.errors?.required">Please select chart size</small>
+                                        <small *ngIf="formGroup.get('chart_size')?.errors?.serverError">{{ formGroup.get('chart_size')?.errors?.serverError }}</small>
                                     </div>
-                                </div>
-                            </ng-container>
-                            <ng-container *ngIf="['pie', 'doughnut'].includes(formGroup.get('chart_type')?.value)">
-                                <div class="form-floating mb-4">
-                                    <select formControlName="label" [class.is-invalid]="formGroup.get('label')?.invalid && (theForm.submitted || formGroup.get('label')?.touched)" class="form-select">
-                                        <option *ngFor="let column of columns" [value]="column.name">{{column.name}}</option>
-                                    </select>
-                                    <label>Label column</label>
-                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('label')?.invalid && (theForm.submitted || formGroup.get('label')?.touched)">
-                                        <small *ngIf="formGroup.get('label')?.errors?.required">Please select column</small>
-                                        <small *ngIf="formGroup.get('label')?.errors?.serverError">{{ formGroup.get('label')?.errors?.serverError }}</small>
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-4">
-                                    <select formControlName="value" [class.is-invalid]="formGroup.get('value')?.invalid && (theForm.submitted || formGroup.get('value')?.touched)" class="form-select">
-                                        <option *ngFor="let column of columns" [value]="column.name">{{column.name}}</option>
-                                    </select>
-                                    <label>Value column</label>
-                                    <div class="text-danger position-absolute" *ngIf="formGroup.get('value')?.invalid && (theForm.submitted || formGroup.get('value')?.touched)">
-                                        <small *ngIf="formGroup.get('value')?.errors?.required">Please select column</small>
-                                        <small *ngIf="formGroup.get('value')?.errors?.serverError">{{ formGroup.get('value')?.errors?.serverError }}</small>
-                                    </div>
-                                </div>
-                            </ng-container>
-                            <div class="form-floating mb-4">
-                                <select formControlName="chart_size" [class.is-invalid]="formGroup.get('chart_size')?.invalid && (theForm.submitted || formGroup.get('chart_size')?.touched)" class="form-select">
-                                    <option value="col-md-12">1/1</option>
-                                    <option value="col-md-6">1/2</option>
-                                    <option value="col-md-4">1/3</option>
-                                    <option value="col-md-3">1/4</option>
-                                </select>
-                                <label>Chart size</label>
-                                <div class="text-danger position-absolute" *ngIf="formGroup.get('chart_size')?.invalid && (theForm.submitted || formGroup.get('chart_size')?.touched)">
-                                    <small *ngIf="formGroup.get('chart_size')?.errors?.required">Please select chart size</small>
-                                    <small *ngIf="formGroup.get('chart_size')?.errors?.serverError">{{ formGroup.get('chart_size')?.errors?.serverError }}</small>
                                 </div>
                             </div>
                         </div>
+                        <ng-container *ngIf="['bar', 'line'].includes(formGroup.get('chart_type')?.value)">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-4">
+                                        <ng-select formControlName="x" [class.is-invalid]="formGroup.get('x')?.invalid && (theForm.submitted || formGroup.get('x')?.touched)" class="form-control" required [clearable]="false">
+                                            <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                                        </ng-select>
+                                        <label>X axis column</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('x')?.invalid && (theForm.submitted || formGroup.get('x')?.touched)">
+                                            <small *ngIf="formGroup.get('x')?.errors?.required">Please select column</small>
+                                            <small *ngIf="formGroup.get('x')?.errors?.serverError">{{ formGroup.get('x')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-4">
+                                        <ng-select formControlName="y" [class.is-invalid]="formGroup.get('y')?.invalid && (theForm.submitted || formGroup.get('y')?.touched)" class="form-control" required [clearable]="false">
+                                            <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                                        </ng-select>
+                                        <label>Y axis column</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('y')?.invalid && (theForm.submitted || formGroup.get('y')?.touched)">
+                                            <small *ngIf="formGroup.get('y')?.errors?.required">Please select column</small>
+                                            <small *ngIf="formGroup.get('y')?.errors?.serverError">{{ formGroup.get('y')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-4">
+                                        <ng-select formControlName="group_by" [class.is-invalid]="formGroup.get('group_by')?.invalid && (theForm.submitted || formGroup.get('group_by')?.touched)" class="form-control">
+                                            <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                                        </ng-select>
+                                        <label>Group by</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('group_by')?.invalid && (theForm.submitted || formGroup.get('group_by')?.touched)">
+                                            <small *ngIf="formGroup.get('group_by')?.errors?.serverError">{{ formGroup.get('group_by')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="['pie', 'doughnut'].includes(formGroup.get('chart_type')?.value)">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-4">
+                                        <ng-select formControlName="label" [class.is-invalid]="formGroup.get('label')?.invalid && (theForm.submitted || formGroup.get('label')?.touched)" class="form-control" required [clearable]="false">
+                                            <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                                        </ng-select>
+                                        <label>Label column</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('label')?.invalid && (theForm.submitted || formGroup.get('label')?.touched)">
+                                            <small *ngIf="formGroup.get('label')?.errors?.required">Please select column</small>
+                                            <small *ngIf="formGroup.get('label')?.errors?.serverError">{{ formGroup.get('label')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-4">
+                                        <ng-select formControlName="value" [class.is-invalid]="formGroup.get('value')?.invalid && (theForm.submitted || formGroup.get('value')?.touched)" class="form-control" required [clearable]="false">
+                                            <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                                        </ng-select>
+                                        <label>Value column</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('value')?.invalid && (theForm.submitted || formGroup.get('value')?.touched)">
+                                            <small *ngIf="formGroup.get('value')?.errors?.required">Please select column</small>
+                                            <small *ngIf="formGroup.get('value')?.errors?.serverError">{{ formGroup.get('value')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="formGroup.get('chart_type')?.value=='table'">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-4">
+                                        <ng-select class="form-control" placeholder="-" formControlName="columns" [multiple]="true" required [class.is-invalid]="formGroup.get('columns')?.invalid && (theForm.submitted || formGroup.get('role_id')?.touched)">
+                                            <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                                        </ng-select>
+                                        <label>Columns</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('columns')?.invalid && (theForm.submitted || formGroup.get('columns')?.touched)">
+                                            <small *ngIf="formGroup.get('columns')?.errors?.required">Please select columns</small>
+                                            <small *ngIf="formGroup.get('columns')?.errors?.serverError">{{ formGroup.get('columns')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-4">
+                                        <ng-select formControlName="sort" [class.is-invalid]="formGroup.get('sort')?.invalid && (theForm.submitted || formGroup.get('sort')?.touched)" class="form-control">
+                                            <ng-option *ngFor="let column of formGroup.get('columns')?.value" [value]="column">{{column}} (Ascending)</ng-option>
+                                            <ng-option *ngFor="let column of formGroup.get('columns')?.value" [value]="'-'+column">{{column}} (Descending)</ng-option>
+                                        </ng-select>
+                                        <label>Sort By</label>
+                                        <div class="text-danger position-absolute" *ngIf="formGroup.get('sort')?.invalid && (theForm.submitted || formGroup.get('sort')?.touched)">
+                                            <small *ngIf="formGroup.get('sort')?.errors?.required">Please select columns</small>
+                                            <small *ngIf="formGroup.get('sort')?.errors?.serverError">{{ formGroup.get('sort')?.errors?.serverError }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
                     </div>
-                </form>
-            </div>
-        </div>
-        <div class="modal-footer d-flex justify-content-between">
-            <div>
-                <div class="spinner-border text-primary" role="status" *ngIf="formDialog.isDeleting && (loading.status | async)">
-                    <span class="visually-hidden">Loading...</span>
                 </div>
-            </div>
-            <div class="text-end">
-                <button type="button" class="btn btn-secondary" (click)="modal.close()" [attr.disabled]="(loading.status | async) ? 'disabled' : null">Cancel</button>
-                &nbsp;
-                <button type="button" class="btn btn-primary" (click)="formDialog.submit()" [attr.disabled]="(loading.status | async) ? 'disabled' : null">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer d-flex justify-content-between">
+        <div>
+            <div class="spinner-border text-primary" role="status" *ngIf="formDialog.isDeleting && (loading.status | async)">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-    </ng-template>
+        <div class="text-end">
+            <button type="button" class="btn btn-secondary" (click)="formDialog.close()" [attr.disabled]="(loading.status | async) ? 'disabled' : null">Cancel</button>
+            &nbsp;
+            <button type="button" class="btn btn-primary" (click)="formDialog.submit()" [attr.disabled]="(loading.status | async) ? 'disabled' : null">Submit</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deleteModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Delete</h5>
+    </div>
+    <div class="modal-body">Are you sure want to delete this data?</div>
+    <div class="modal-footer d-flex justify-content-between">
+        <div>
+            <div class="spinner-border text-primary" role="status" *ngIf="deleteDialog.isDeleting && (loading.status | async)">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-primary" (click)="modal.close()" [attr.disabled]="(loading.status | async) ? 'disabled' : null">Cancel</button>
+            &nbsp;
+            <button type="button" class="btn btn-danger" (click)="deleteDialog.submit()" [attr.disabled]="(loading.status | async) ? 'disabled' : null">Delete</button>
+        </div>
+    </div>
+</ng-template>

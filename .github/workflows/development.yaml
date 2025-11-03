@@ -1,0 +1,67 @@
+name: development
+
+on:
+  push:
+    branches: ["development"]
+
+jobs:
+  development:
+    #if: true #set false to disable job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Angular
+        run: npm run build
+
+      - name: Get Project Name from package.json
+        id: project_name
+        run: echo "PROJECT_NAME=$(jq -r .name package.json)" >> $GITHUB_ENV
+
+      - name: Check Project Name
+        run: echo "Project Name is ${{ env.PROJECT_NAME }}"
+
+      - name: Compress Build Files
+        run: tar -czvf build.tar.gz -C dist/$PROJECT_NAME/browser .
+
+      - name: Check if build.tar.gz exists
+        run: ls -lah build.tar.gz
+
+      - name: Upload build.tar.gz via SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEV_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DEV_SSH_HOST }} >> ~/.ssh/known_hosts
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no build.tar.gz ${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }}:${{ vars.UPLOAD_PATH }}/build.tar.gz
+
+      - name: Extract and Clean on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USER }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          script: |
+            cd "${{ vars.UPLOAD_PATH }}"
+            rm -rf index.html *.css *.js *.woff* assets/ media/
+            tar -xzvf build.tar.gz
+            rm build.tar.gz
