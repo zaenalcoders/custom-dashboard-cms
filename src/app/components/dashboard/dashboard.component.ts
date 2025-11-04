@@ -3,11 +3,11 @@ import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@an
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoadingService } from '../../services/loading.service';
 import { NgbModal, NgbDropdownMenu, NgbDropdown, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap';
-import { NgLabelTemplateDirective, NgOptionTemplateDirective, NgSelectComponent, NgOptionComponent } from '@ng-select/ng-select';
+import { NgSelectComponent, NgOptionComponent } from '@ng-select/ng-select';
 import { HttpService } from '../../services/http.service';
 import { ToastrService } from 'ngx-toastr';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-import { Chart, Legend, Colors, Tooltip, ArcElement, BarController, CategoryScale, LinearScale, BarElement, DoughnutController, LineController, PointElement, LineElement, PieController, plugins } from 'chart.js';
+import { Chart, Legend, Colors, Tooltip, ArcElement, BarController, CategoryScale, LinearScale, BarElement, DoughnutController, LineController, PointElement, LineElement, PieController, Filler } from 'chart.js';
 @Component({
     selector: 'app-dashboard',
     standalone: true,
@@ -46,7 +46,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             BarElement,
             PointElement,
             LineElement,
-            PieController
+            PieController,
+            Filler
         );
     }
     @ViewChild('formModal') formModal: any;
