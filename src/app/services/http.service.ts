@@ -171,9 +171,7 @@ export class HttpService {
             })
             .finally(() => {
                 if (!noLoading) {
-                    if (!noLoading) {
-                        this.loading.done();
-                    }
+                    this.loading.done();
                 }
             }) as Promise<{ success: boolean, response: any }>;
     }

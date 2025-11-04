@@ -8,3 +8,47 @@
         </div>
     </div>
 </div>
+<div *ngIf="auth.isLoggedIn() && (auth.isTimeOut | async)" class="position-fixed w-100 h-100 bg-dark bg-opacity-50 top-0 start-0 auth-timeout">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-md-4 col-12">
+            <div class="card border-0">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="h4 fw-bold lh-1">Session timeout</div>
+                        <div class="text-muted">Please type your password</div>
+                    </div>
+                    <form class="auth-form" #authForm="ngForm" (ngSubmit)="submitLogin(loginForm)" novalidate>
+                        <div [formGroup]="loginForm">
+                            <div class="form-floating mb-4">
+                                <input type="email" required readonly="readonly" [value]="auth.getUserData()?.email" placeholder="name@example.com" class="form-control">
+                                <label for="floatingInput">Email</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input type="password" tabindex="1" formControlName="password" [class.is-invalid]="loginForm.get('password')?.invalid && (authForm.submitted || loginForm.get('password')?.touched)" class="form-control mb-0" id="floatingPassword" placeholder="Password" required [appAutoFocus]="true">
+                                <label for="floatingPassword">{{'Password'}}</label>
+                                <div class="text-danger position-absolute w-100" *ngIf="loginForm.get('password')?.invalid && (authForm.submitted || loginForm.get('password')?.touched)">
+                                    <small *ngIf="loginForm.get('password')?.errors?.required">Type your password</small>
+                                    <small *ngIf="loginForm.get('password')?.errors?.serverError">{{loginForm.get('password')?.errors?.serverError}}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div>
+                                        <div class="spinner-border text-primary" role="status" *ngIf="loading.status|async">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="button" tabindex="3" class="btn btn-outline-danger" (click)="authLogout()" [attr.disabled]="(loading.status|async) ? 'disabled' : null">Logout</button>
+                                    &nbsp;
+                                    <button class="btn btn-primary" tabindex="2" type="submit" [attr.disabled]="(loading.status|async) ? 'disabled' : null">Login</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

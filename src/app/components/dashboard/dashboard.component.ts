@@ -180,7 +180,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     async getDataSources(): Promise<void> {
         this.modalLoading = true;
         const r = await this.http.Get('data-sources', {}, true);
-        this.dataSources = r.response.result.data || [];
+        this.dataSources = r.response?.result?.data || [];
         this.modalLoading = false;
     }
 
@@ -194,11 +194,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             const idx = this.chartList.findIndex((i: any) => i.id == id);
             let chart;
             if (idx >= 0) {
-                this.chartList[idx] = r.response.result.data;
+                this.chartList[idx] = r.response?.result?.data;
                 chart = this.chartList[idx];
                 chart.loading = true;
             } else {
-                this.chartList.unshift(r.response.result.data);
+                this.chartList.unshift(r.response?.result?.data);
                 chart = this.chartList[0];
                 chart.loading = true;
             }
@@ -209,7 +209,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
             return;
         } else {
-            this.chartList = r.response.result.data || [];
+            this.chartList = r.response?.result?.data || [];
         }
         for (const chart of this.chartList) {
             chart.loading = true;
